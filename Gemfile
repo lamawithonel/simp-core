@@ -24,7 +24,7 @@ gem 'coderay'
 gem 'puppet', puppetversion
 gem 'puppet-lint'
 gem 'puppetlabs_spec_helper'
-gem 'simp-rake-helpers', '~>2.0'
+gem 'simp-rake-helpers', :git => 'https://github.com/lamawithonel/rubygem-simp-rake-helpers.git', :branch => 'SIMP-1423'
 gem 'simp-build-helpers', '>=0.1.0'
 gem 'parallel'
 gem 'dotenv'
