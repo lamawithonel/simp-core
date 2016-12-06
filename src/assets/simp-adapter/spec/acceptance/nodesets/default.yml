@@ -1,6 +1,7 @@
 HOSTS:
   el7:
     roles:
+      - builder
       - server
       - default
     platform:   el-7-x86_64
