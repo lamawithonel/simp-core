@@ -24,12 +24,6 @@ common_build_deps = [
 ]
 
 describe 'The RPM build' do
-  after(:all) do
-    # Save the generated RPMs
-    Dir.mkdir(File.join(Dir.pwd, 'spec', 'fixtures', 'dist')) || nil
-    scp_from builder, "#{build_dir}/dist/*", File.join(Dir.pwd, 'spec', 'fixtures', 'dist')
-  end
-
   context 'with a properly initialized environment' do
     before(:context) do
       # Sync relevant files files to the build host
@@ -60,9 +54,20 @@ describe 'The RPM build' do
       on builder, 'rvm implode --force && rm -rf /etc/rvm'
     end
 
-    it 'should build cleanly' do
+    it 'should build cleanly' do |example|
       on builder, "cd #{build_dir}; bundle install"
       on builder, "cd #{build_dir}; bundle exec rake pkg:rpm[#{builder[:mock_chroot]},true]"
+
+      # Save the generated RPMs
+      unless example.exception
+        begin
+          Dir.mkdir(File.join(Dir.pwd, 'spec', 'fixtures', 'dist'))
+        rescue Errno::EEXIST
+          nil
+        end
+        scp_from builder, "#{build_dir}/dist/simp-adapter-0.0.1-0.noarch.rpm",    File.join(Dir.pwd, 'spec', 'fixtures', 'dist')
+        scp_from builder, "#{build_dir}/dist/simp-adapter-pe-0.0.1-0.noarch.rpm", File.join(Dir.pwd, 'spec', 'fixtures', 'dist')
+      end
     end
   end
 end
