@@ -2,10 +2,14 @@ require 'spec_helper_acceptance'
 
 test_name 'pupmod-simp-beakertest'
 
-install_target = host.puppet['codedir'] || host.puppet['confdir']
-
 describe 'The pupmod-simp-beakertest RPM' do
   hosts.each do |host|
+    install_target = unless !host.puppet['codedir'] || host.puppet['codedir'].empty?
+                       host.puppet['codedir']
+                     else
+                       host.puppet['confdir']
+                     end
+
     before(:all) do
       sut_yum_repo = '/srv/local_yum'
       sut_yum_repo_conf = <<-EOM.gsub(/^[[:blank:]]+/, '')
@@ -93,7 +97,7 @@ describe 'The pupmod-simp-beakertest RPM' do
           ---
           copy_rpm_data : true
         EOM
-        create_remote_file host, '/etc/simp/simp_adapter_config.yaml', config_yaml
+        create_remote_file host, '/etc/simp/adapter_config.yaml', config_yaml
       end
 
       context 'and the Puppe $codedir is unmanaged' do
@@ -135,8 +139,9 @@ describe 'The pupmod-simp-beakertest RPM' do
 
           # Stuba pre-existing, Git-managed beakertest module
           # TODO: This should be moved to its own context. In this context it shouldn't really matter given the control repo.
-          #host.mkdir_p("#{install_target}/environments/simp/modules/beakertest")
-          #on host, "cd #{install_target}/environments/simp/modules/beakertest && git init . && git add . && git commit -a -m woo")
+          host.mkdir_p("#{install_target}/environments/simp/modules/beakertest")
+          create_remote_file(host, "#{install_target}/environments/simp/modules/beakertest/git_controlled_file", '# IMA TEST')
+          on host, "cd #{install_target}/environments/simp/modules/beakertest && git init . && git add . && git commit -a -m woo"
         end
 
         it 'installs without error' do
@@ -171,18 +176,3 @@ describe 'The pupmod-simp-beakertest RPM' do
     end
   end
 end
-
-    context '' do
-      it 'copies SIMP environment data to the appropriate location' do
-        subject { on(host, "cat #{install_target}/environments/simp/test_file").output }
-        expect(:subject).to match(%r{Just testing stuff})
-      end
-
-      it 'uninstalls without error' do
-        host.uninstall_package('simp-environment')
-      end
-
-      it 'removes itself from the Puppet $codedir during uninstallation' do
-        on(host, "test ! -f #{install_target}/environments/simp/test_file")
-      end
-    end
