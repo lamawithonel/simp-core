@@ -1,95 +1,51 @@
-## SIMP Core
+This is the 6.X series of the [SIMP](https://github.com/NationalSecurityAgency/SIMP) supermodule.
 
-This is the Git [supermodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
-for all of the SIMP build materials.
 
-The different releases are tracked on their own branches and the master branch
-should generally be ignored.
+1. [Supported releases](#supported-releases)
+2. [Building the SIMP ISO](#building-the-simp-iso)
+  1. [Prerequisites](#prerequisites)
+  2. [Quickstart](#quickstart)
+  3. [Full build procedure](#full-procedure)
+3. [Links](#links)
 
-This will change in the future when we merge the two branches into a single
-distribution.
 
-## Getting Started
+## Supported releases
+This branch supports:
+  - RHEL 7.2
+  - [CentOS 7 1511](http://isoredirect.centos.org/centos/7.2.1511/isos/x86_64/CentOS-7-x86_64-DVD-1511.iso)
 
-### Project Structure
 
-As you can probably tell, the `master` branch of this project is empty.
+## Building the SIMP ISO
 
-There are currently two other branches, `4.2.X` and `5.1.X`. These correspond
-to RHEL/CentOS 6 and 7, respectively. The `5.1.X` branch will be used
-throughout this guide, but feel free to switch back and forth.
 
-### Setting up your environment
+**NOTE** The following examples use `CentOS-7-x86_64-DVD-1511.iso` as an overlay source.
 
-We suggest installing [RVM](https://rvm.io) to make it easy to manage several
-versions of ruby at once. Here are some quick commands to get it installed
-(taken from the project's [installation page](https://rvm.io/rvm/install)):
+### Prerequisites
+   - You must first:
+     - [Set up your build environment](https://simp-project.atlassian.net/wiki/display/SD/Setting+up+your+build+environment)
+     - Download an appropriate source ISO to overlay (in this example CentOS-7-x86_64-DVD-1511.iso)
+     - If building the release tarballs from scratch:
+        - ~70GB free in the mock root directory (generally this is `/var/lib/mock`)
 
+### Quickstart
+
+
+The minimum necessary command to build SIMP from scratch is:
 ```bash
-$ gpg2 --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
-$ \curl -sSL https://get.rvm.io | bash -s stable --ruby=1.9.3 --ruby=2.1.0
-$ source ~/.rvm/scripts/rvm
+bundle exec rake build:auto[6.X,path/to/CentOS-7-x86_64-DVD-1511.iso]
 ```
 
-Because this project is primarily written in Ruby, we use a few key Ruby tools.
-The Ruby community and this project makes heavy use of Gems, the native Ruby
-package.
 
-#### Set the Default Ruby
-
-The latest stable version of Ruby in use by Puppet, at the time of writing, is
-Ruby 2.1.0. Therefore, we suggest setting your Ruby default to 2.1.0 so that
-your environment will work as expected over time.
-
+If building from published [release tarball](https://bintray.com/artifact/download/simp/Releases/SIMP-DVD-CentOS-5.1.0-2.tar.gz):
 ```bash
-$ rvm use --default 2.1.0
+bundle exec rake build:auto[6.X,path/to/CentOS-7-x86_64-DVD-1511.iso,path/to/SIMP-DVD-CentOS-6.0.0-0.tar.gz]
 ```
 
-After you have done this, you may simply use the following command to switch to
-the default Ruby installation:
 
-```bash
-$ rvm use default
-```
+### Full procedure
+There is full procedure for [compiling the SIMP tarball and ISO](https://simp-project.atlassian.net/wiki/display/SD/Compiling+the+SIMP+Tarball+and+ISO) in the [SIMP Development](https://simp-project.atlassian.net/wiki/display/SD/) documentation.
 
-#### Bundler
-
-The next important tool is [Bundler](http://bundler.io/). Bundler makes it easy
-to install Gems and their dependencies. It gets this information from the
-`Gemfile` found in the root of each repo. The `Gemfile` contains all of the
-gems required for working with the repo.  More info on Bundler can be
-found [on the Bundler Rationale Page](http://bundler.io/rationale.html) and
-more information on Rubygems can be found
-[at Rubygems.org](http://guides.rubygems.org/what-is-a-gem/).
-
-Bundler should be installed using the following command. It will install this
-Gem for every version of Ruby you've installed in RVM. If you've been following
-this guide then this will be 1.9.3 and 2.1.0.
-
-```bash
-$ rvm all do gem install bundler
-```
-
-#### Preparing to Work
-
-You are now ready to begin working on SIMP!
-
-Clone the repository using `git clone`:
-
-```bash
-$ git clone https://github.com/simp/simp-core.git --branch 5.1.X
-$ cd simp-core
-```
-
-You've now cloned the `simp-core` Git repository into a folder named `simp-core`.
-
-Next, you need to install the dependencies using `bundler`.
-
-```bash
-$ bundle install
-```
-
-You should now have an environment where you can develop. Run `rake -T` or
-`rake -D` to see what options are available.
-
-Have fun!
+## Links
+- [SIMP master repository](https://github.com/NationalSecurityAgency/SIMP)
+- [SIMP Development documentation](https://simp-project.atlassian.net/wiki/display/SD)
+- [SIMP admin/user documentation](http://simp.readthedocs.org/en/latest/)
